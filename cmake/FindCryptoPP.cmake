@@ -65,18 +65,16 @@ if(CryptoPP_VERSION_HEADER)
 
     string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_REVISION[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
     set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_1})
-
-    set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
-    set(CryptoPP_VERSION_${CryptoPP_VERSION_MAJOR} TRUE)
 elseif(CryptoPP_INCLUDE_DIR)
     file(STRINGS ${CryptoPP_INCLUDE_DIR}/cryptopp/config.h _config_version REGEX "CRYPTOPP_VERSION")
     string(REGEX MATCH "([0-9]+)([0-9]+)([0-9]+)" _match_version ${_config_version})
     set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
     set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_2})
     set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_3})
-    set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
-    set(CryptoPP_VERSION_${CryptoPP_VERSION_MAJOR} TRUE)
 endif()
+
+set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
+set(CryptoPP_VERSION_${CryptoPP_VERSION_MAJOR} TRUE)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CryptoPP
