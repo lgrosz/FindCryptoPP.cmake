@@ -25,6 +25,11 @@ if (CryptoPP_ROOT_DIR)
         NO_DEFAULT_PATH
         PATHS ${CryptoPP_ROOT_DIR}/include
         )
+    find_file(CryptoPP_VERSION_HEADER
+        NAMES cryptopp/config_ver.h
+        NO_DEFAULT_PATH
+        PATHS ${CryptoPP_ROOT_DIR}/include
+    )
     find_library(CryptoPP_LIBRARY
         NAMES cryptopp
         DOC "CryptoPP library"
@@ -37,6 +42,9 @@ else()
         NAMES cryptopp/config.h
         DOC "CryptoPP include directory"
         )
+    find_file(CryptoPP_VERSION_HEADER
+        NAMES cryptopp/config_ver.h
+    )
     find_library(CryptoPP_LIBRARY
         NAMES cryptopp
         DOC "CryptoPP library"
@@ -46,7 +54,21 @@ else()
     message("PACZPAN without root given: ${CryptoPP_INCLUDE_DIR} ${CryptoPP_LIBRARY}")
 endif(CryptoPP_ROOT_DIR)
 
-if(CryptoPP_INCLUDE_DIR)
+if(CryptoPP_VERSION_HEADER)
+    file(READ ${CryptoPP_VERSION_HEADER} version_content)
+
+    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MAJOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+    set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
+
+    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MINOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+    set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_1})
+
+    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_REVISION[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+    set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_1})
+
+    set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
+    set(CryptoPP_VERSION_${CryptoPP_VERSION_MAJOR} TRUE)
+elseif(CryptoPP_INCLUDE_DIR)
     file(STRINGS ${CryptoPP_INCLUDE_DIR}/cryptopp/config.h _config_version REGEX "CRYPTOPP_VERSION")
     string(REGEX MATCH "([0-9]+)([0-9]+)([0-9]+)" _match_version ${_config_version})
     set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
@@ -74,3 +96,5 @@ set(CryptoPP_INCLUDE_DIRS ${CryptoPP_INCLUDE_DIR})
 set(CryptoPP_LIBRARIES ${CryptoPP_LIBRARY})
 set(CryptoPP_VERSION_STRING ${CryptoPP_VERSION})
 
+# Clean-up variables
+unset(CryptoPP_VERSION_HEADER)
