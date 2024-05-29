@@ -13,6 +13,7 @@ CryptoPP_VERSION     - The version of the library
 CryptoPP_VERSION_MAJOR - The major version of the library
 CryptoPP_VERSION_MINOR - The minor version of the library
 CryptoPP_VERSION_PATCH - The patch version (revision) of the library
+CryptoPP_VERSION_VV  - Whether or not version VV has been found
 CryptoPP_VERSION_STRING - The version of the library (for compatability, use CryptoPP_VERSION instead)
 ]]
 
@@ -52,6 +53,7 @@ if(CryptoPP_INCLUDE_DIR)
     set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_2})
     set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_3})
     set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
+    set(CryptoPP_VERSION_${CryptoPP_VERSION_MAJOR} TRUE)
 endif()
 
 include(FindPackageHandleStandardArgs)
