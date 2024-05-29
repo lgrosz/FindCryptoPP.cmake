@@ -10,6 +10,9 @@ CryptoPP::CryptoPP   - target (release build)
 CryptoPP_INCLUDE_DIR - includes directory containing subdirectory cryptopp/
 CryptoPP_LIBRARY     - CryptoPP library file (libcryptopp.a)
 CryptoPP_VERSION     - The version of the library
+CryptoPP_VERSION_MAJOR - The major version of the library
+CryptoPP_VERSION_MINOR - The minor version of the library
+CryptoPP_VERSION_PATCH - The patch version (revision) of the library
 CryptoPP_VERSION_STRING - The version of the library (for compatability, use CryptoPP_VERSION instead)
 ]]
 
@@ -45,7 +48,10 @@ endif(CryptoPP_ROOT_DIR)
 if(CryptoPP_INCLUDE_DIR)
     file(STRINGS ${CryptoPP_INCLUDE_DIR}/cryptopp/config.h _config_version REGEX "CRYPTOPP_VERSION")
     string(REGEX MATCH "([0-9]+)([0-9]+)([0-9]+)" _match_version ${_config_version})
-    set(CryptoPP_VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+    set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
+    set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_2})
+    set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_3})
+    set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
 endif()
 
 include(FindPackageHandleStandardArgs)
