@@ -1,10 +1,4 @@
 #[[
-based on https://github.com/riebl/vanetza/blob/aed571d6297258a2a499b9cb4eedb8254d977360/cmake/FindCryptoPP.cmake
-
-Input:
-CryptoPP_ROOT_DIR (optional) - specify where CryptoPP was installed
-    (e.g. /usr/local or $CMAKE_SOURCE_DIR/3rdparty/usr/local)
-    Directory must contain subdirectories include and lib
 Output:
 CryptoPP::CryptoPP   - target (release build)
 CryptoPP_INCLUDE_DIR - includes directory containing subdirectory cryptopp/
@@ -17,42 +11,9 @@ CryptoPP_VERSION_VV  - Whether or not version VV has been found
 CryptoPP_VERSION_STRING - The version of the library (for compatability, use CryptoPP_VERSION instead)
 ]]
 
-if (CryptoPP_ROOT_DIR)
-    # find using CryptoPP_ROOT_DIR ONLY
-    find_path(CryptoPP_INCLUDE_DIR
-        NAMES cryptopp/config.h
-        DOC "CryptoPP include directory"
-        NO_DEFAULT_PATH
-        PATHS ${CryptoPP_ROOT_DIR}/include
-        )
-    find_file(CryptoPP_VERSION_HEADER
-        NAMES cryptopp/config_ver.h
-        NO_DEFAULT_PATH
-        PATHS ${CryptoPP_ROOT_DIR}/include
-    )
-    find_library(CryptoPP_LIBRARY
-        NAMES cryptopp
-        DOC "CryptoPP library"
-        NO_DEFAULT_PATH
-        PATHS ${CryptoPP_ROOT_DIR}/lib
-        )
-    message("PACZPAN with root given: ${CryptoPP_INCLUDE_DIR} ${CryptoPP_LIBRARY}")
-else()
-    find_path(CryptoPP_INCLUDE_DIR
-        NAMES cryptopp/config.h
-        DOC "CryptoPP include directory"
-        )
-    find_file(CryptoPP_VERSION_HEADER
-        NAMES cryptopp/config_ver.h
-    )
-    find_library(CryptoPP_LIBRARY
-        NAMES cryptopp
-        DOC "CryptoPP library"
-        NO_PACKAGE_ROOT_PATH
-        PATHS "/usr/lib/x86_64-linux-gnu/"
-        )
-    message("PACZPAN without root given: ${CryptoPP_INCLUDE_DIR} ${CryptoPP_LIBRARY}")
-endif(CryptoPP_ROOT_DIR)
+find_path(CryptoPP_INCLUDE_DIR NAMES cryptopp/config.h DOC "CryptoPP include directory")
+find_library(CryptoPP_LIBRARY NAMES cryptopp DOC "CryptoPP library")
+find_file(CryptoPP_VERSION_HEADER NAMES cryptopp/config_ver.h)
 
 if(CryptoPP_VERSION_HEADER)
     file(READ ${CryptoPP_VERSION_HEADER} version_content)
