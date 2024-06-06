@@ -15,23 +15,31 @@ find_path(CryptoPP_INCLUDE_DIR NAMES cryptopp/config.h DOC "CryptoPP include dir
 find_library(CryptoPP_LIBRARY NAMES cryptopp DOC "CryptoPP library")
 find_file(CryptoPP_VERSION_HEADER NAMES cryptopp/config_ver.h)
 
-if(CryptoPP_VERSION_HEADER)
-    file(READ ${CryptoPP_VERSION_HEADER} version_content)
+# Determine version from headers
+if(CryptoPP_INCLUDE_DIR)
+    find_file(CryptoPP_VERSION_HEADER NAMES cryptopp/config_ver.h PATHS ${CryptoPP_INCLUDE_DIR} NO_DEFAULT_PATH)
+    find_file(CryptoPP_CONFIG_HEADER NAMES cryptopp/config.h PATHS ${CryptoPP_INCLUDE_DIR} NO_DEFAULT_PATH)
 
-    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MAJOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
-    set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
+    if (CryptoPP_VERSION_HEADER)
+        # Since CryptoPP 8.3, version information is housed in config_ver.h
+        file(READ ${CryptoPP_VERSION_HEADER} version_content)
+        string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MAJOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+        set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
+        string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MINOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+        set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_1})
+        string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_REVISION[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
+        set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_1})
+    elseif(CryptoPP_CONFIG_HEADER)
+        file(STRINGS ${CryptoPP_INCLUDE_DIR}/cryptopp/config.h _config_version REGEX "CRYPTOPP_VERSION")
+        string(REGEX MATCH "([0-9]+)([0-9]+)([0-9]+)" _match_version ${_config_version})
+        set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
+        set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_2})
+        set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_3})
+    endif()
 
-    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_MINOR[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
-    set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_1})
-
-    string(REGEX MATCHALL "#define[ \\t\\r\\n]+CRYPTOPP_REVISION[ \\t\\r\\n]+([0-9]+)" _ "${version_content}")
-    set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_1})
-elseif(CryptoPP_INCLUDE_DIR)
-    file(STRINGS ${CryptoPP_INCLUDE_DIR}/cryptopp/config.h _config_version REGEX "CRYPTOPP_VERSION")
-    string(REGEX MATCH "([0-9]+)([0-9]+)([0-9]+)" _match_version ${_config_version})
-    set(CryptoPP_VERSION_MAJOR ${CMAKE_MATCH_1})
-    set(CryptoPP_VERSION_MINOR ${CMAKE_MATCH_2})
-    set(CryptoPP_VERSION_PATCH ${CMAKE_MATCH_3})
+    # Clean-up variables
+    unset(CryptoPP_VERSION_HEADER)
+    unset(CryptoPP_CONFIG_HEADER)
 endif()
 
 set(CryptoPP_VERSION "${CryptoPP_VERSION_MAJOR}.${CryptoPP_VERSION_MINOR}.${CryptoPP_VERSION_PATCH}")
@@ -54,6 +62,3 @@ mark_as_advanced(CryptoPP_INCLUDE_DIR CryptoPP_LIBRARY)
 set(CryptoPP_INCLUDE_DIRS ${CryptoPP_INCLUDE_DIR})
 set(CryptoPP_LIBRARIES ${CryptoPP_LIBRARY})
 set(CryptoPP_VERSION_STRING ${CryptoPP_VERSION})
-
-# Clean-up variables
-unset(CryptoPP_VERSION_HEADER)
